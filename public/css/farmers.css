@@ -1,0 +1,327 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f7faf8;
+    color: #183b2b
+}
+
+.farmers-hero {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(120deg, rgba(10, 62, 35, .94), rgba(27, 120, 66, .78)), url('images/5.jpg') center/cover;
+    padding: 55px 20px
+}
+
+.farmers-hero-content {
+    width: 1050px;
+    max-width: 90%;
+    margin: auto;
+    color: #fff
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, .15);
+    border: 1px solid rgba(255, 255, 255, .25);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px
+}
+
+.farmers-hero h1 {
+    font-size: 42px;
+    margin: 18px 0 10px
+}
+
+.farmers-hero p {
+    font-size: 15px;
+    color: #e7f5ec;
+    max-width: 650px;
+    line-height: 1.6
+}
+
+.back-link {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 22px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13px
+}
+
+.farmers-page {
+    width: 1050px;
+    max-width: 90%;
+    margin: 55px auto 70px
+}
+
+.market-info {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    margin-bottom: 24px
+}
+
+.section-label {
+    color: #16874a;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px
+}
+
+.market-info h2 {
+    margin-top: 6px;
+    font-size: 28px;
+    color: #173d2b
+}
+
+.farmer-count {
+    padding: 8px 13px;
+    border-radius: 20px;
+    background: #eaf8ef;
+    color: #16874a;
+    font-size: 13px;
+    font-weight: 700
+}
+
+.farmer-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px
+}
+
+.farmer-card {
+    background: #fff;
+    border: 1px solid #e2ece6;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(26, 65, 43, .07);
+    transition: .25s ease
+}
+
+.farmer-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 35px rgba(26, 90, 52, .13);
+    border-color: #b9ddc7
+}
+
+.farmer-image-wrap {
+    height: 205px;
+    position: relative;
+    background: #eaf5ed
+}
+
+.farmer-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover
+}
+
+.farmer-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: #16874a;
+    color: #fff;
+    border-radius: 18px;
+    padding: 7px 11px;
+    font-size: 11px;
+    font-weight: 700
+}
+
+.map-circle {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    color: #16874a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .12)
+}
+
+.farmer-content {
+    padding: 20px
+}
+
+.shop-name {
+    font-size: 20px;
+    color: #173d2b;
+    margin-bottom: 7px
+}
+
+.farmer-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #667a70;
+    font-size: 13px;
+    margin-bottom: 12px
+}
+
+.farmer-name i {
+    color: #16874a
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 18px;
+    color: #f59e0b;
+    font-size: 14px
+}
+
+.rating span {
+    color: #7b8c84;
+    font-weight: 600
+}
+
+.farmer-location {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding-top: 15px;
+    border-top: 1px solid #edf2ee;
+    color: #71837a;
+    font-size: 13px;
+    line-height: 1.5
+}
+
+.farmer-location i {
+    color: #16874a;
+    margin-top: 2px
+}
+
+.location-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 17px;
+    padding: 11px 14px;
+    border: 1px solid #16874a;
+    border-radius: 10px;
+    color: #16874a;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition: .2s
+}
+
+.location-button:hover {
+    background: #16874a;
+    color: #fff
+}
+
+.empty-state {
+    text-align: center;
+    background: #fff;
+    border: 1px solid #e2ece6;
+    border-radius: 18px;
+    padding: 50px;
+    color: #71837a;
+    grid-column: 1/-1
+}
+
+.farmers-footer {
+    background: #0e3b27;
+    color: #dcefe3;
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    padding: 35px max(5%, calc((100% - 1050px)/2));
+    font-size: 13px
+}
+
+.farmers-footer strong {
+    font-size: 21px;
+    color: #fff
+}
+
+.farmers-footer p {
+    margin-top: 8px;
+    color: #a9c4b4
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px
+}
+
+.footer-links a {
+    color: #dcefe3;
+    text-decoration: none
+}
+
+.footer-links a:hover {
+    color: #7be495
+}
+
+@media(max-width:900px) {
+    .farmer-grid {
+        grid-template-columns: repeat(2, 1fr)
+    }
+
+    .farmers-hero h1 {
+        font-size: 35px
+    }
+}
+
+@media(max-width:600px) {
+    .nav-links {
+        display: none
+    }
+
+    .auth-buttons {
+        display: none
+    }
+
+    .farmer-grid {
+        grid-template-columns: 1fr
+    }
+
+    .farmers-page {
+        max-width: 92%;
+        margin-top: 38px
+    }
+
+    .farmers-hero {
+        min-height: 260px
+    }
+
+    .farmers-hero h1 {
+        font-size: 29px
+    }
+
+    .market-info {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px
+    }
+
+    .farmers-footer {
+        flex-direction: column
+    }
+
+    .footer-links {
+        flex-wrap: wrap
+    }
+}
