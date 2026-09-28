@@ -124,22 +124,25 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 
-    // coustomer routes
+    // customer routes
     Route::middleware('role:customer')->prefix('customer')->group(function () {
 
         Route::get('/dashboard', [CustomerDashboard::class, 'index']);
 
-        Route::get('/orders',                [OrderController::class, 'myOrders']);
-        Route::post('/orders',               [OrderController::class, 'store']);
-        Route::get('/orders/{order}',        [OrderController::class, 'showOwn']);
+        Route::get('/orders',                 [OrderController::class, 'myOrders']);
+        Route::post('/orders',                [OrderController::class, 'store']);
+        Route::get('/orders/{order}',         [OrderController::class, 'showOwn']);
+        Route::put('/orders/{order}',         [OrderController::class, 'update']);
         Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel']);
+        Route::post('/orders/{order}/reorder', [OrderController::class, 'reorder']);
 
-        Route::get('/favorites',             [FavoriteController::class, 'index']);
-        Route::post('/favorites',            [FavoriteController::class, 'store']);
-        Route::delete('/favorites/{id}',     [FavoriteController::class, 'destroy']);
+        Route::get('/favorites',              [FavoriteController::class, 'index']);
+        Route::get('/favorites/check',        [FavoriteController::class, 'check']);
+        Route::post('/favorites',             [FavoriteController::class, 'store']);
+        Route::delete('/favorites/{id}',      [FavoriteController::class, 'destroy']);
 
-        Route::post('/reviews',              [ReviewController::class, 'store']);
-        Route::put('/reviews/{review}',      [ReviewController::class, 'update']);
-        Route::delete('/reviews/{review}',   [ReviewController::class, 'destroy']);
+        Route::post('/reviews',               [ReviewController::class, 'store']);
+        Route::put('/reviews/{review}',       [ReviewController::class, 'update']);
+        Route::delete('/reviews/{review}',    [ReviewController::class, 'destroy']);
     });
 });

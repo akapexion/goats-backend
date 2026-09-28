@@ -10,7 +10,9 @@ class FarmerProfileController extends Controller
 {
     public function index(Request $request)
     {
-        $query = FarmerProfile::with(['user', 'market']);
+        $query = FarmerProfile::with(['user', 'market', 'products' => function ($q) {
+            $q->where('status', 'available')->with('category');
+        }]);
 
         if (!$request->boolean('all')) {
             $query->where('approval_status', 'approved');

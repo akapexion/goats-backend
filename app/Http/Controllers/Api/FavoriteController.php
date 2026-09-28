@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Favorite;
 use App\Models\Product;
-use App\Models\FarmerProfile;
+use App\Models\Market;
 use Illuminate\Http\Request;
 
 class FavoriteController extends Controller
@@ -23,16 +23,44 @@ class FavoriteController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function check(Request $request)
     {
         $validated = $request->validate([
-            'favoritable_type' => 'required|in:product,farmer',
+            'favoritable_type' => 'required|in:product,farmer,market',
             'favoritable_id'   => 'required|integer',
         ]);
 
-        $type = $validated['favoritable_type'] === 'product'
-            ? Product::class
-            : FarmerProfile::class;
+        $type = match ($validated['favoritable_type']) {
+            'product' => Product::class,
+            'farmer'  => FarmerProfile::class,
+            'market'  => Market::class,
+        };
+
+        $favorite = Favorite::where([
+            'user_id'          => $request->user()->id,
+            'favoritable_type' => $type,
+            'favoritable_id'   => $validated['favoritable_id'],
+        ])->first();
+
+        return response()->json([
+            'status'       => true,
+            'is_favorited' => (bool) $favorite,
+            'favorite_id'  => $favorite?->id,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'favoritable_type' => 'required|in:product,farmer,market',
+            'favoritable_id'   => 'required|integer',
+        ]);
+
+        $type = match ($validated['favoritable_type']) {
+            'product' => Product::class,
+            'farmer'  => FarmerProfile::class,
+            'market'  => Market::class,
+        };
 
         $existing = Favorite::where([
             'user_id'          => $request->user()->id,
@@ -44,6 +72,7 @@ class FavoriteController extends Controller
             return response()->json([
                 'status'  => false,
                 'message' => 'Already in favorites',
+                'favorite_id' => $existing->id,
             ], 422);
         }
 

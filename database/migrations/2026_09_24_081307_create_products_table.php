@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('farmer_profile_id')->constrained()->cascadeOnDelete();
             $table->foreignId('category_id')->constrained()->restrictOnDelete();
+            $table->foreignId('market_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name', 100);
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);

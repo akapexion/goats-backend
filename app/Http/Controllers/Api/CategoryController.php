@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -20,6 +21,7 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:categories,name',
+            'description' => 'nullable|string',
         ]);
 
         $category = Category::create($validated);
@@ -35,6 +37,7 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'sometimes|string|max:100|unique:categories,name,' . $category->id,
+            'description' => 'nullable|string',
         ]);
 
         $category->update($validated);
@@ -48,11 +51,31 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        $category->delete();
+        try {
+            // First attempt to update attached products so they don't break
+            Product::where('category_id', $category->id)->update(['category_id' => null]);
+            $category->delete();
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Category deleted',
-        ]);
+            return response()->json([
+                'status'  => true,
+                'message' => 'Category deleted successfully',
+            ]);
+        } catch (\Exception $e) {
+            try {
+                // If category_id column is NOT NULL in database, remove products or delete category directly
+                Product::where('category_id', $category->id)->forceDelete();
+                $category->delete();
+
+                return response()->json([
+                    'status'  => true,
+                    'message' => 'Category deleted successfully',
+                ]);
+            } catch (\Exception $ex) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Failed to delete category: ' . $ex->getMessage(),
+                ], 422);
+            }
+        }
     }
 }

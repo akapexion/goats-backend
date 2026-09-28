@@ -47,33 +47,43 @@ class ReviewController extends Controller
             'comment'           => 'nullable|string|max:1000',
         ]);
 
+        $completedOrderQuery = Order::where('customer_id', $request->user()->id)
+            ->where('farmer_profile_id', $validated['farmer_profile_id'])
+            ->where('status', 'completed');
+
         if ($validated['order_id'] ?? null) {
-            $order = Order::find($validated['order_id']);
-            if (!$order || $order->customer_id !== $request->user()->id) {
-                return response()->json(['status' => false, 'message' => 'Order not found.'], 403);
-            }
-            if ($order->status !== 'completed') {
-                return response()->json(['status' => false, 'message' => 'You can only review completed orders.'], 422);
-            }
+            $completedOrderQuery->where('id', $validated['order_id']);
+        }
+
+        $completedOrder = $completedOrderQuery->first();
+
+        if (!$completedOrder) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'You can only rate/review a farmer after completing an order with them.',
+            ], 422);
         }
 
         $already = Review::where('customer_id', $request->user()->id)
             ->where('farmer_profile_id', $validated['farmer_profile_id'])
-            ->when($validated['product_id'] ?? null, fn($q) => $q->where('product_id', $validated['product_id']))
             ->when($validated['order_id'] ?? null, fn($q) => $q->where('order_id', $validated['order_id']))
             ->exists();
 
         if ($already) {
-            return response()->json(['status' => false, 'message' => 'You have already reviewed this.'], 422);
+            return response()->json([
+                'status'  => false,
+                'message' => 'You have already submitted a review for this order/farmer.',
+            ], 422);
         }
 
         $validated['customer_id'] = $request->user()->id;
+        $validated['order_id']    = $completedOrder->id;
 
         $review = Review::create($validated);
 
         return response()->json([
             'status'  => true,
-            'message' => 'Review submitted',
+            'message' => 'Review submitted successfully',
             'data'    => $review->load('customer'),
         ], 201);
     }

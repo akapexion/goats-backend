@@ -8,23 +8,41 @@ use Illuminate\Http\Request;
 
 class MarketController extends Controller
 {
-    // Public: list all markets
-    public function index()
+    // Public: list all markets with filters and farmer count
+    public function index(Request $request)
     {
+        $query = Market::where('is_active', true)->withCount('farmers');
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('city', 'like', '%' . $request->search . '%')
+                  ->orWhere('address', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('day')) {
+            $query->where('open_days', 'like', '%' . $request->day . '%');
+        }
+
         return response()->json([
             'status' => true,
-            'data'   => Market::where('is_active', true)
-                              ->orderBy('name')
-                              ->paginate(20),
+            'data'   => $query->orderBy('name')->paginate(20),
         ]);
     }
 
-    // Public: single market
+    // Public: single market with associated farmers and available products
     public function show(Market $market)
     {
         return response()->json([
             'status' => true,
-            'data'   => $market->load('farmers'),
+            'data'   => $market->load([
+                'farmers' => function ($query) {
+                    $query->where('approval_status', 'approved')->with(['user', 'products' => function ($pq) {
+                        $pq->where('status', 'available');
+                    }]);
+                }
+            ]),
         ]);
     }
 

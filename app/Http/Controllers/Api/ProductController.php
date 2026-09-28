@@ -11,7 +11,7 @@ class ProductController extends Controller
     // Public: list products with filters
     public function index(Request $request)
     {
-        $query = Product::with(['farmer', 'category'])
+        $query = Product::with(['farmer.user', 'market', 'category'])
                         ->where('status', 'available');
 
         if ($request->filled('category_id')) {
@@ -20,14 +20,38 @@ class ProductController extends Controller
         if ($request->filled('farmer_profile_id')) {
             $query->where('farmer_profile_id', $request->farmer_profile_id);
         }
+        if ($request->filled('market_id')) {
+            $marketId = $request->market_id;
+            $query->where(function ($q) use ($marketId) {
+                $q->where('market_id', $marketId)
+                  ->orWhereHas('farmer', function ($fq) use ($marketId) {
+                      $fq->where('market_id', $marketId);
+                  });
+            });
+        }
+        if ($request->filled('market_day')) {
+            $day = $request->market_day;
+            $query->whereHas('farmer', function ($q) use ($day) {
+                $q->where('operating_days', 'like', '%' . $day . '%')
+                  ->orWhereHas('market', function ($mq) use ($day) {
+                      $mq->where('open_days', 'like', '%' . $day . '%');
+                  });
+            });
+        }
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
         }
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
         }
         if ($request->filled('max_price')) {
             $query->where('price', '<=', $request->max_price);
+        }
+        if ($request->boolean('in_stock_only')) {
+            $query->where('stock_quantity', '>', 0);
         }
 
         return response()->json([
@@ -41,7 +65,7 @@ class ProductController extends Controller
     {
         return response()->json([
             'status' => true,
-            'data'   => $product->load(['farmer', 'category']),
+            'data'   => $product->load(['farmer.user', 'market', 'category', 'reviews.customer']),
         ]);
     }
 
@@ -60,7 +84,7 @@ class ProductController extends Controller
 
         return response()->json([
             'status' => true,
-            'data'   => $farmer->products()->with('category')->latest()->paginate(20),
+            'data'   => $farmer->products()->with(['category', 'market'])->latest()->paginate(20),
         ]);
     }
 
@@ -78,6 +102,7 @@ class ProductController extends Controller
 
         $validated = $request->validate([
             'category_id'    => 'required|exists:categories,id',
+            'market_id'      => 'nullable|exists:markets,id',
             'name'           => 'required|string|max:100',
             'description'    => 'nullable|string',
             'price'          => 'required|numeric|min:0',
@@ -86,6 +111,10 @@ class ProductController extends Controller
             'status'         => 'sometimes|in:available,sold_out,hidden',
             'image'          => 'nullable|image|max:2048',
         ]);
+
+        if (empty($validated['market_id']) && $farmer->market_id) {
+            $validated['market_id'] = $farmer->market_id;
+        }
 
         if ($request->hasFile('image')) {
             $validated['image_path'] = $request->file('image')->store('products', 'public');
@@ -98,7 +127,7 @@ class ProductController extends Controller
         return response()->json([
             'status'  => true,
             'message' => 'Product created',
-            'data'    => $product,
+            'data'    => $product->load(['category', 'market']),
         ], 201);
     }
 
@@ -109,6 +138,7 @@ class ProductController extends Controller
 
         $validated = $request->validate([
             'category_id'    => 'sometimes|exists:categories,id',
+            'market_id'      => 'nullable|exists:markets,id',
             'name'           => 'sometimes|string|max:100',
             'description'    => 'nullable|string',
             'price'          => 'sometimes|numeric|min:0',
@@ -127,7 +157,7 @@ class ProductController extends Controller
         return response()->json([
             'status'  => true,
             'message' => 'Product updated',
-            'data'    => $product,
+            'data'    => $product->load(['category', 'market']),
         ]);
     }
 
@@ -173,7 +203,7 @@ class ProductController extends Controller
 
     public function adminIndex(Request $request)
     {
-        $query = Product::with(['farmer.user', 'category']);
+        $query = Product::with(['farmer.user', 'market', 'category']);
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
@@ -201,7 +231,7 @@ class ProductController extends Controller
 
         return response()->json([
             'status' => true,
-            'data'   => $product->load('category'),
+            'data'   => $product->load(['category', 'market']),
         ]);
     }
 }
