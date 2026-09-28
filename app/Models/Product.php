@@ -14,6 +14,27 @@ class Product extends Model
         'price', 'unit', 'image_path', 'stock_quantity', 'status',
     ];
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        $path = $this->image_path;
+        if (!$path) {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
+            return $path;
+        }
+
+        $cleanPath = ltrim($path, '/');
+        if (str_starts_with($cleanPath, 'storage/')) {
+            $cleanPath = substr($cleanPath, 8);
+        }
+
+        return url('storage/' . $cleanPath);
+    }
+
     public function farmer()
     {
         return $this->belongsTo(FarmerProfile::class, 'farmer_profile_id');
