@@ -67,6 +67,23 @@ class OrderController extends Controller
 
             DB::commit();
 
+            // Notify admin users of new placed order
+            try {
+                $order->load(['customer']);
+                $admins = \App\Models\User::where('role', 'admin')->get();
+                foreach ($admins as $admin) {
+                    $exists = $admin->notifications()
+                        ->where('data->order_id', $order->id)
+                        ->exists();
+
+                    if (! $exists) {
+                        $admin->notify(new \App\Notifications\NewOrderNotification($order));
+                    }
+                }
+            } catch (\Throwable $ne) {
+                \Illuminate\Support\Facades\Log::warning('Order notification failed: ' . $ne->getMessage());
+            }
+
             return response()->json([
                 'status'  => true,
                 'message' => 'Pre-order placed successfully',

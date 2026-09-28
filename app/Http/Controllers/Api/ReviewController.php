@@ -47,37 +47,33 @@ class ReviewController extends Controller
             'comment'           => 'nullable|string|max:1000',
         ]);
 
-        $completedOrderQuery = Order::where('customer_id', $request->user()->id)
+        $completedOrder = Order::where('customer_id', $request->user()->id)
             ->where('farmer_profile_id', $validated['farmer_profile_id'])
-            ->where('status', 'completed');
+            ->when($validated['order_id'] ?? null, fn($q) => $q->where('id', $validated['order_id']))
+            ->where('status', 'completed')
+            ->latest()
+            ->first();
 
-        if ($validated['order_id'] ?? null) {
-            $completedOrderQuery->where('id', $validated['order_id']);
+        $alreadyQuery = Review::where('customer_id', $request->user()->id)
+            ->where('farmer_profile_id', $validated['farmer_profile_id']);
+
+        if (!empty($validated['product_id'])) {
+            $alreadyQuery->where('product_id', $validated['product_id']);
+        } elseif (!empty($validated['order_id'])) {
+            $alreadyQuery->where('order_id', $validated['order_id']);
+        } else {
+            $alreadyQuery->whereNull('product_id')->whereNull('order_id');
         }
 
-        $completedOrder = $completedOrderQuery->first();
-
-        if (!$completedOrder) {
+        if ($alreadyQuery->exists()) {
             return response()->json([
                 'status'  => false,
-                'message' => 'You can only rate/review a farmer after completing an order with them.',
-            ], 422);
-        }
-
-        $already = Review::where('customer_id', $request->user()->id)
-            ->where('farmer_profile_id', $validated['farmer_profile_id'])
-            ->when($validated['order_id'] ?? null, fn($q) => $q->where('order_id', $validated['order_id']))
-            ->exists();
-
-        if ($already) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'You have already submitted a review for this order/farmer.',
+                'message' => 'You have already submitted a review for this.',
             ], 422);
         }
 
         $validated['customer_id'] = $request->user()->id;
-        $validated['order_id']    = $completedOrder->id;
+        $validated['order_id']    = $completedOrder ? $completedOrder->id : ($validated['order_id'] ?? null);
 
         $review = Review::create($validated);
 
