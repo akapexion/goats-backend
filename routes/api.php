@@ -23,6 +23,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/markets', [MarketController::class, 'index']);
 Route::get('/markets/{market}', [MarketController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/categories/{category}', [CategoryController::class, 'show']);
 Route::get('/farmers', [FarmerProfileController::class, 'index']);
 Route::get('/farmers/{farmer}', [FarmerProfileController::class, 'show']);
 Route::get('/products', [ProductController::class, 'index']);

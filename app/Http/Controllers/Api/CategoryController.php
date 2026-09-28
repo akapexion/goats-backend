@@ -17,6 +17,25 @@ class CategoryController extends Controller
         ]);
     }
 
+    public function show($id)
+    {
+        $category = is_numeric($id)
+            ? Category::find($id)
+            : Category::where('name', 'like', '%' . str_replace('-', ' ', $id) . '%')->first();
+
+        if (!$category) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Category not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data'   => $category,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

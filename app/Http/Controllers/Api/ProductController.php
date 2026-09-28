@@ -16,6 +16,19 @@ class ProductController extends Controller
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
+        if ($request->filled('category')) {
+            $cat = $request->category;
+            $query->where(function ($q) use ($cat) {
+                if (is_numeric($cat)) {
+                    $q->where('category_id', $cat);
+                } else {
+                    $cleaned = str_replace('-', ' ', $cat);
+                    $q->whereHas('category', function ($cq) use ($cleaned) {
+                        $cq->where('name', 'like', '%' . $cleaned . '%');
+                    });
+                }
+            });
+        }
         if ($request->filled('farmer_profile_id')) {
             $query->where('farmer_profile_id', $request->farmer_profile_id);
         }
