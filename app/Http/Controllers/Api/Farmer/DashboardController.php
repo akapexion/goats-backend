@@ -44,13 +44,13 @@ class DashboardController extends Controller
         return response()->json([
             'status' => true,
             'stats'  => [
-                'total_orders'    => $totalOrders,
-                'pending_orders'  => $pendingOrders,
-                'total_revenue'   => $totalRevenue,
-                'total_products'  => $totalProducts,
+                'total_orders'   => $totalOrders,
+                'pending_orders' => $pendingOrders,
+                'total_revenue'  => $totalRevenue,
+                'total_products' => $totalProducts,
             ],
-            'recent_orders' => $recentOrders,
-            'top_products'  => $topProducts,
+            'recent_orders'   => $recentOrders,
+            'top_products'    => $topProducts,
             'approval_status' => $farmer->approval_status,
         ]);
     }

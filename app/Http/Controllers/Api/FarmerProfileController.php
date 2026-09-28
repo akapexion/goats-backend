@@ -66,16 +66,16 @@ class FarmerProfileController extends Controller
 
         if (!$profile) {
             $validated = $request->validate([
-                'stall_name'         => 'required|string|max:100',
-                'market_id'          => 'nullable|exists:markets,id',
-                'description'        => 'nullable|string',
-                'address'            => 'nullable|string',
-                'operating_days'     => 'nullable|string|max:50',
-                'pickup_start_time'  => 'nullable|date_format:H:i',
-                'pickup_end_time'    => 'nullable|date_format:H:i',
-                'cutoff_hours'       => 'nullable|integer|min:1|max:72',
-                'latitude'           => 'nullable|numeric',
-                'longitude'          => 'nullable|numeric',
+                'stall_name'        => 'required|string|max:100',
+                'market_id'         => 'nullable|exists:markets,id',
+                'description'       => 'nullable|string',
+                'address'           => 'nullable|string',
+                'operating_days'    => 'nullable|string|max:50',
+                'pickup_start_time' => 'nullable|date_format:H:i',
+                'pickup_end_time'   => 'nullable|date_format:H:i',
+                'cutoff_hours'      => 'nullable|integer|min:1|max:72',
+                'latitude'          => 'nullable|numeric',
+                'longitude'         => 'nullable|numeric',
             ]);
 
             $validated['user_id']         = $user->id;
@@ -84,16 +84,16 @@ class FarmerProfileController extends Controller
             $profile = FarmerProfile::create($validated);
         } else {
             $validated = $request->validate([
-                'stall_name'         => 'sometimes|string|max:100',
-                'market_id'          => 'nullable|exists:markets,id',
-                'description'        => 'nullable|string',
-                'address'            => 'nullable|string',
-                'operating_days'     => 'nullable|string|max:50',
-                'pickup_start_time'  => 'nullable|date_format:H:i',
-                'pickup_end_time'    => 'nullable|date_format:H:i',
-                'cutoff_hours'       => 'nullable|integer|min:1|max:72',
-                'latitude'           => 'nullable|numeric',
-                'longitude'          => 'nullable|numeric',
+                'stall_name'        => 'sometimes|string|max:100',
+                'market_id'         => 'nullable|exists:markets,id',
+                'description'       => 'nullable|string',
+                'address'           => 'nullable|string',
+                'operating_days'    => 'nullable|string|max:50',
+                'pickup_start_time' => 'nullable|date_format:H:i',
+                'pickup_end_time'   => 'nullable|date_format:H:i',
+                'cutoff_hours'      => 'nullable|integer|min:1|max:72',
+                'latitude'          => 'nullable|numeric',
+                'longitude'         => 'nullable|numeric',
             ]);
 
             $profile->update($validated);

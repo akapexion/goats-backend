@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    // Public: list products with filters
     public function index(Request $request)
     {
         $query = Product::with(['farmer.user', 'market', 'category'])
@@ -60,7 +59,6 @@ class ProductController extends Controller
         ]);
     }
 
-    // Public: single product
     public function show(Product $product)
     {
         return response()->json([
@@ -69,7 +67,6 @@ class ProductController extends Controller
         ]);
     }
 
-    // Farmer: my products
     public function myProducts(Request $request)
     {
         $farmer = $request->user()->farmerProfile;
@@ -88,7 +85,6 @@ class ProductController extends Controller
         ]);
     }
 
-    // Farmer: create product
     public function store(Request $request)
     {
         $farmer = $request->user()->farmerProfile;
@@ -131,7 +127,6 @@ class ProductController extends Controller
         ], 201);
     }
 
-    // Farmer: update product
     public function update(Request $request, Product $product)
     {
         $this->authorizeProduct($request, $product);
@@ -161,7 +156,6 @@ class ProductController extends Controller
         ]);
     }
 
-    // Farmer: delete product
     public function destroy(Request $request, Product $product)
     {
         $this->authorizeProduct($request, $product);
@@ -174,7 +168,6 @@ class ProductController extends Controller
         ]);
     }
 
-    // Farmer: update status
     public function updateStatus(Request $request, Product $product)
     {
         $this->authorizeProduct($request, $product);

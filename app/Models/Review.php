@@ -11,8 +11,23 @@ class Review extends Model
         'rating', 'comment', 'farmer_reply', 'is_visible',
     ];
 
-    public function customer() { return $this->belongsTo(User::class, 'customer_id'); }
-    public function farmer()   { return $this->belongsTo(FarmerProfile::class, 'farmer_profile_id'); }
-    public function product()  { return $this->belongsTo(Product::class); }
-    public function order()    { return $this->belongsTo(Order::class); }
+    public function customer()
+    {
+        return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function farmer()
+    {
+        return $this->belongsTo(FarmerProfile::class, 'farmer_profile_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

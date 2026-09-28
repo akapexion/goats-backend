@@ -20,7 +20,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:100|unique:categories,name',
+            'name'        => 'required|string|max:100|unique:categories,name',
             'description' => 'nullable|string',
         ]);
 
@@ -36,7 +36,7 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $validated = $request->validate([
-            'name' => 'sometimes|string|max:100|unique:categories,name,' . $category->id,
+            'name'        => 'sometimes|string|max:100|unique:categories,name,' . $category->id,
             'description' => 'nullable|string',
         ]);
 
@@ -52,7 +52,6 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         try {
-            // First attempt to update attached products so they don't break
             Product::where('category_id', $category->id)->update(['category_id' => null]);
             $category->delete();
 
@@ -62,7 +61,6 @@ class CategoryController extends Controller
             ]);
         } catch (\Exception $e) {
             try {
-                // If category_id column is NOT NULL in database, remove products or delete category directly
                 Product::where('category_id', $category->id)->forceDelete();
                 $category->delete();
 

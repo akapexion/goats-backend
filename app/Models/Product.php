@@ -14,9 +14,28 @@ class Product extends Model
         'price', 'unit', 'image_path', 'stock_quantity', 'status',
     ];
 
-    public function farmer()   { return $this->belongsTo(FarmerProfile::class, 'farmer_profile_id'); }
-    public function category() { return $this->belongsTo(Category::class); }
-    public function market()   { return $this->belongsTo(Market::class); }
-    public function orderItems(){ return $this->hasMany(OrderItem::class); }
-    public function reviews()  { return $this->hasMany(Review::class); }
+    public function farmer()
+    {
+        return $this->belongsTo(FarmerProfile::class, 'farmer_profile_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function market()
+    {
+        return $this->belongsTo(Market::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

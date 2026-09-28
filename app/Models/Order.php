@@ -11,8 +11,23 @@ class Order extends Model
         'status', 'total_amount', 'note',
     ];
 
-    public function customer() { return $this->belongsTo(User::class, 'customer_id'); }
-    public function farmer()   { return $this->belongsTo(FarmerProfile::class, 'farmer_profile_id'); }
-    public function items()    { return $this->hasMany(OrderItem::class); }
-    public function reviews()  { return $this->hasMany(Review::class); }
+    public function customer()
+    {
+        return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function farmer()
+    {
+        return $this->belongsTo(FarmerProfile::class, 'farmer_profile_id');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class MarketController extends Controller
 {
-    // Public: list all markets with filters and farmer count
     public function index(Request $request)
     {
         $query = Market::where('is_active', true)->withCount('farmers');
@@ -31,7 +30,6 @@ class MarketController extends Controller
         ]);
     }
 
-    // Public: single market with associated farmers and available products
     public function show(Market $market)
     {
         return response()->json([
@@ -46,18 +44,17 @@ class MarketController extends Controller
         ]);
     }
 
-    // Admin: create
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:100',
-            'address'     => 'required|string',
-            'city'        => 'nullable|string|max:100',
-            'latitude'    => 'nullable|numeric|between:-90,90',
-            'longitude'   => 'nullable|numeric|between:-180,180',
-            'open_days'   => 'nullable|string|max:50',
-            'open_time'   => 'nullable',
-            'close_time'  => 'nullable',
+            'name'       => 'required|string|max:100',
+            'address'    => 'required|string',
+            'city'       => 'nullable|string|max:100',
+            'latitude'   => 'nullable|numeric|between:-90,90',
+            'longitude'  => 'nullable|numeric|between:-180,180',
+            'open_days'  => 'nullable|string|max:50',
+            'open_time'  => 'nullable',
+            'close_time' => 'nullable',
         ]);
 
         foreach (['city', 'latitude', 'longitude', 'open_days', 'open_time', 'close_time'] as $field) {
@@ -75,19 +72,18 @@ class MarketController extends Controller
         ], 201);
     }
 
-    // Admin: update
     public function update(Request $request, Market $market)
     {
         $validated = $request->validate([
-            'name'        => 'sometimes|string|max:100',
-            'address'     => 'sometimes|string',
-            'city'        => 'nullable|string|max:100',
-            'latitude'    => 'nullable|numeric',
-            'longitude'   => 'nullable|numeric',
-            'open_days'   => 'nullable|string|max:50',
-            'open_time'   => 'nullable',
-            'close_time'  => 'nullable',
-            'is_active'   => 'sometimes|boolean',
+            'name'      => 'sometimes|string|max:100',
+            'address'   => 'sometimes|string',
+            'city'      => 'nullable|string|max:100',
+            'latitude'  => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'open_days' => 'nullable|string|max:50',
+            'open_time' => 'nullable',
+            'close_time'=> 'nullable',
+            'is_active' => 'sometimes|boolean',
         ]);
 
         foreach (['city', 'latitude', 'longitude', 'open_days', 'open_time', 'close_time'] as $field) {
@@ -105,7 +101,6 @@ class MarketController extends Controller
         ]);
     }
 
-    // Admin: delete
     public function destroy(Market $market)
     {
         $market->delete();

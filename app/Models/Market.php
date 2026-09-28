@@ -11,5 +11,8 @@ class Market extends Model
         'open_days', 'open_time', 'close_time', 'is_active',
     ];
 
-    public function farmers() { return $this->hasMany(FarmerProfile::class); }
+    public function farmers()
+    {
+        return $this->hasMany(FarmerProfile::class);
+    }
 }

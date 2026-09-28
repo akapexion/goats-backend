@@ -7,10 +7,6 @@ use Illuminate\Http\Request;
 
 class RoleMiddleware
 {
-    /**
-     * Handle an incoming request.
-     * Usage in routes: middleware('role:admin') or middleware('role:admin,farmer')
-     */
     public function handle(Request $request, Closure $next, ...$roles)
     {
         $user = $request->user();

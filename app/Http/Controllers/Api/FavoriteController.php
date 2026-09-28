@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Favorite;
+use App\Models\FarmerProfile;
 use App\Models\Product;
 use App\Models\Market;
 use Illuminate\Http\Request;
@@ -70,8 +71,8 @@ class FavoriteController extends Controller
 
         if ($existing) {
             return response()->json([
-                'status'  => false,
-                'message' => 'Already in favorites',
+                'status'      => false,
+                'message'     => 'Already in favorites',
                 'favorite_id' => $existing->id,
             ], 422);
         }

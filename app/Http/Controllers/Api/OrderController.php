@@ -11,17 +11,16 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    // Customer: place a new pre-order
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'farmer_profile_id' => 'required|exists:farmer_profiles,id',
-            'pickup_date'       => 'required|date|after_or_equal:today',
-            'pickup_time'       => 'required',
-            'note'              => 'nullable|string',
-            'items'             => 'required|array|min:1',
-            'items.*.product_id'=> 'required|exists:products,id',
-            'items.*.quantity'  => 'required|integer|min:1',
+            'farmer_profile_id'  => 'required|exists:farmer_profiles,id',
+            'pickup_date'        => 'required|date|after_or_equal:today',
+            'pickup_time'        => 'required',
+            'note'               => 'nullable|string',
+            'items'              => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity'   => 'required|integer|min:1',
         ]);
 
         DB::beginTransaction();
@@ -38,7 +37,6 @@ class OrderController extends Controller
 
             $total = 0;
             foreach ($validated['items'] as $item) {
-                // Lock row for update inside transaction to prevent overselling race conditions
                 $product = Product::where('id', $item['product_id'])->lockForUpdate()->firstOrFail();
 
                 if ($product->farmer_profile_id !== $order->farmer_profile_id) {
@@ -60,7 +58,6 @@ class OrderController extends Controller
                     'price'      => $product->price,
                 ]);
 
-                // Deduct stock quantity
                 $product->decrement('stock_quantity', $item['quantity']);
 
                 $total += $product->price * $item['quantity'];
@@ -85,7 +82,6 @@ class OrderController extends Controller
         }
     }
 
-    // Customer: list my orders
     public function myOrders(Request $request)
     {
         return response()->json([
@@ -97,7 +93,6 @@ class OrderController extends Controller
         ]);
     }
 
-    // Customer: single order detail
     public function showOwn(Request $request, Order $order)
     {
         if ($order->customer_id !== $request->user()->id) {
@@ -110,7 +105,6 @@ class OrderController extends Controller
         ]);
     }
 
-    // Customer: modify eligible order
     public function update(Request $request, Order $order)
     {
         if ($order->customer_id !== $request->user()->id) {
@@ -125,23 +119,21 @@ class OrderController extends Controller
         }
 
         $validated = $request->validate([
-            'pickup_date'       => 'sometimes|date|after_or_equal:today',
-            'pickup_time'       => 'sometimes',
-            'note'              => 'nullable|string',
-            'items'             => 'sometimes|array|min:1',
-            'items.*.product_id'=> 'required_with:items|exists:products,id',
-            'items.*.quantity'  => 'required_with:items|integer|min:1',
+            'pickup_date'        => 'sometimes|date|after_or_equal:today',
+            'pickup_time'        => 'sometimes',
+            'note'               => 'nullable|string',
+            'items'              => 'sometimes|array|min:1',
+            'items.*.product_id' => 'required_with:items|exists:products,id',
+            'items.*.quantity'   => 'required_with:items|integer|min:1',
         ]);
 
         DB::beginTransaction();
         try {
             if (isset($validated['items'])) {
-                // First, restore stock for current order items
                 foreach ($order->items as $oldItem) {
                     Product::where('id', $oldItem->product_id)->increment('stock_quantity', $oldItem->quantity);
                 }
 
-                // Delete old items
                 $order->items()->delete();
 
                 $total = 0;
@@ -194,7 +186,6 @@ class OrderController extends Controller
         }
     }
 
-    // Customer: cancel order and restore stock
     public function cancel(Request $request, Order $order)
     {
         if ($order->customer_id !== $request->user()->id) {
@@ -210,7 +201,6 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            // Restore stock for all items
             foreach ($order->items as $item) {
                 Product::where('id', $item->product_id)->increment('stock_quantity', $item->quantity);
             }
@@ -232,7 +222,6 @@ class OrderController extends Controller
         }
     }
 
-    // Customer: re-order a previous order
     public function reorder(Request $request, Order $order)
     {
         if ($order->customer_id !== $request->user()->id) {
@@ -306,7 +295,6 @@ class OrderController extends Controller
         }
     }
 
-    // Admin: reports
     public function adminReport(Request $request)
     {
         $query = Order::with(['customer', 'farmer.user']);
@@ -323,18 +311,18 @@ class OrderController extends Controller
             $query->whereDate('created_at', '<=', $request->to);
         }
 
-        $orders        = $query->latest()->paginate(30);
-        $totalRevenue  = Order::where('status', 'completed')->sum('total_amount');
-        $totalOrders   = Order::count();
-        $statusCounts  = Order::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
+        $orders       = $query->latest()->paginate(30);
+        $totalRevenue = Order::where('status', 'completed')->sum('total_amount');
+        $totalOrders  = Order::count();
+        $statusCounts = Order::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
 
         return response()->json([
-            'status'        => true,
-            'data'          => $orders,
-            'summary'       => [
-                'total_orders'   => $totalOrders,
-                'total_revenue'  => $totalRevenue,
-                'status_counts'  => $statusCounts,
+            'status'  => true,
+            'data'    => $orders,
+            'summary' => [
+                'total_orders'  => $totalOrders,
+                'total_revenue' => $totalRevenue,
+                'status_counts' => $statusCounts,
             ],
         ]);
     }
