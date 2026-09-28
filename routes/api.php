@@ -57,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'total_customers' => \App\Models\User::where('role', 'customer')->count(),
                 'total_markets' => \App\Models\Market::count(),
                 'total_orders' => \App\Models\Order::count(),
+                'total_revenue' => (float) \App\Models\Order::whereNotIn('status', ['cancelled'])->sum('total_amount'),
             ],
         ]));
 

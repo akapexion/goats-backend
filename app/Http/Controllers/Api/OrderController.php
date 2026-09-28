@@ -328,9 +328,29 @@ class OrderController extends Controller
             $query->whereDate('created_at', '<=', $request->to);
         }
 
-        $orders       = $query->latest()->paginate(30);
-        $totalRevenue = Order::where('status', 'completed')->sum('total_amount');
-        $totalOrders  = Order::count();
+        $orders = $query->latest()->paginate(30);
+
+        $revenueQuery = Order::query();
+        if ($request->filled('status')) {
+            $revenueQuery->where('status', $request->status);
+        } else {
+            $revenueQuery->whereNotIn('status', ['cancelled']);
+        }
+
+        if ($request->filled('from')) {
+            $revenueQuery->whereDate('created_at', '>=', $request->from);
+        }
+
+        if ($request->filled('to')) {
+            $revenueQuery->whereDate('created_at', '<=', $request->to);
+        }
+
+        $totalRevenue = (float) $revenueQuery->sum('total_amount');
+
+        $totalOrders = $request->filled('status') || $request->filled('from') || $request->filled('to')
+            ? (clone $query)->count()
+            : Order::count();
+
         $statusCounts = Order::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
 
         return response()->json([
